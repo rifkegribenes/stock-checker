@@ -16,22 +16,53 @@ const handleError = (res, err) => {
   return res.status(500).json({message: err});
 }
 
+const getStockData = (stock) => {
+
+  return new Promise((resolve, reject) => {
+    const now = new Date();
+    const YYYY = now.getFullYear();
+    const MM = now.getMonth() + 1;
+    const DD = now.getDate();
+
+    utils.getContent(`https://www.quandl.com/api/v3/datasets/WIKI/${stock}.json?api_key=${process.env.QUANDL_API_KEY}&start_date=${YYYY}-${MM}-${DD}&end_date=${YYYY}-${MM}-${DD}`)
+      .then((data) => {
+        resolve(data.dataset.data);
+      })
+      .catch((err) => {
+        console.log('api.js > getStockData utils.getContent');
+        console.log(err);
+        reject(err);
+      });
+
+  });
+
+}
+
 module.exports = function (app) {
 
   app.route('/api/stock-prices')
     .get((req, res) => {
       const { stock } = req.body;
 
-      const url = `https://finance.google.com/finance/info?q=NASDAQ%3a${stock}`
-
-      utils.getContent(url)
+      getStockData(stock)
         .then((data) => {
-          console.log(`data returned from google finance api for ${stock}`
-          const books = data.items.filter((book) => book.volumeInfo.imageLinks.thumbnail && book.volumeInfo.imageLinks.thumbnail.length);
-          return res.status(200).json({ books });
+          console.log(`stockData for ${stock}`);
+          console.log(data);
+          const newStock = new Stock({
+            stock,
+            price: data.price,
+            likes: 0
+          });
+          newStock.save()
+            .then((stock) => {
+          }
+          )
+            .catch()
+        
+          return res.status(200).json({ newStock });
         })
         .catch((err) => {
-          console.log(`book.ctrl.js > searchBook: ${err}`);
+          console.log(`api.js > get utils.getContent ${err}`);
           return handleError(res, err);
         });
     });
