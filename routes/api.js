@@ -55,11 +55,12 @@ module.exports = function (app) {
           });
           newStock.save()
             .then((stock) => {
-            
+              return res.status(200).json(stock);
             })
-            .catch()
-        
-          return res.status(200).json({ newStock });
+            .catch((err) => {
+              console.log(`api.js > get newStock.save ${err}`);
+              return handleError(res, err);
+            });         
         })
         .catch((err) => {
           console.log(`api.js > get utils.getContent ${err}`);
