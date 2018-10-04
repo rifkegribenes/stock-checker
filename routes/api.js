@@ -27,13 +27,10 @@ const getStockData = (stock) => {
     const DD = now.getDate();
     
     const url = `https://api.iextrading.com/1.0/stock/${stock}/batch?types=quote&last=1`;
-    // const url = `https://www.quandl.com/api/v3/datasets/EOD/${stock}.json?limit=1&api_key=${process.env.QUANDL_API_KEY}`
-    // const url = `https://www.quandl.com/api/v3/datasets/WIKI/${stock}.json?api_key=${process.env.QUANDL_API_KEY}&start_date=${YYYY}-${MM}-${DD}&end_date=${YYYY}-${MM}-${DD}`;
-    console.log(url);
 
     utils.getContent(url)
       .then((data) => {
-        resolve(data.dataset.data);
+        resolve(data.quote.iexRealtimePrice);
       })
       .catch((err) => {
         console.log('api.js > getStockData utils.getContent');
@@ -52,12 +49,10 @@ module.exports = function (app) {
       const { stock } = req.query;
 
       getStockData(stock)
-        .then((data) => {
-          console.log(`stockData for ${stock}`);
-          console.log(data);
+        .then((price) => {
           const newStock = new Stock({
             stock,
-            price: data.price,
+            price,
             likes: 0
           });
           newStock.save()
