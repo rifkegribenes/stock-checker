@@ -17,14 +17,19 @@ const handleError = (res, err) => {
 }
 
 const getStockData = (stock) => {
+  
+  console.log(`stock: ${stock}`);
 
   return new Promise((resolve, reject) => {
     const now = new Date();
     const YYYY = now.getFullYear();
     const MM = now.getMonth() + 1;
     const DD = now.getDate();
+    
+    const url = `https://www.quandl.com/api/v3/datasets/WIKI/${stock}.json?api_key=${process.env.QUANDL_API_KEY}&start_date=${YYYY}-${MM}-${DD}&end_date=${YYYY}-${MM}-${DD}`;
+    console.log(url);
 
-    utils.getContent(`https://www.quandl.com/api/v3/datasets/WIKI/${stock}.json?api_key=${process.env.QUANDL_API_KEY}&start_date=${YYYY}-${MM}-${DD}&end_date=${YYYY}-${MM}-${DD}`)
+    utils.getContent(url)
       .then((data) => {
         resolve(data.dataset.data);
       })
@@ -42,7 +47,7 @@ module.exports = function (app) {
 
   app.route('/api/stock-prices')
     .get((req, res) => {
-      const { stock } = req.body;
+      const { stock } = req.query;
 
       getStockData(stock)
         .then((data) => {
