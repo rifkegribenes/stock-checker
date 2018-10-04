@@ -55,8 +55,8 @@ module.exports = function (app) {
           });
           newStock.save()
             .then((stock) => {
-          }
-          )
+            
+            })
             .catch()
         
           return res.status(200).json({ newStock });
