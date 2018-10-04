@@ -26,7 +26,9 @@ const getStockData = (stock) => {
     const MM = now.getMonth() + 1;
     const DD = now.getDate();
     
-    const url = `https://www.quandl.com/api/v3/datasets/WIKI/${stock}.json?api_key=${process.env.QUANDL_API_KEY}&start_date=${YYYY}-${MM}-${DD}&end_date=${YYYY}-${MM}-${DD}`;
+    const url = `https://api.iextrading.com/1.0/stock/${stock}/batch?types=quote&last=1`;
+    // const url = `https://www.quandl.com/api/v3/datasets/EOD/${stock}.json?limit=1&api_key=${process.env.QUANDL_API_KEY}`
+    // const url = `https://www.quandl.com/api/v3/datasets/WIKI/${stock}.json?api_key=${process.env.QUANDL_API_KEY}&start_date=${YYYY}-${MM}-${DD}&end_date=${YYYY}-${MM}-${DD}`;
     console.log(url);
 
     utils.getContent(url)
