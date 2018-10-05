@@ -110,7 +110,6 @@ module.exports = function (app) {
  
               // if the stock is not yet in the db
                 if (!stockFromMongo) {
-                  console.log('121');
                   // if it was liked, save the liker's IP in the likeIPs array
                   if (like) {
                     likeIPs.push(likeIP);
@@ -129,29 +128,24 @@ module.exports = function (app) {
                       return handleError(res, err);
                     });
                 } else { // if the stock already exists in mongo
-                    // if the stock was liked, update and save it
-                    if (like) {
-                      // if this IP does not already exist in the likeIPs array
-                      if (stockFromMongo._doc.likeIPs.indexOf(likeIP) === -1) {
-                        // add the new IP to the array of likeIPs
-                        stockFromMongo._doc.likeIPs.push(likeIP);
-                        // save the updated stock to mongo and return to client
-                        stockFromMongo.save()
-                          .then((savedStock) => {
-                            createStockObject(savedStock._doc, single, res)
-                          })
-                          .catch((err) => {
-                            return handleError(res, err);
-                          });
+                    // if the stock was liked, and if IP does not already exist in 
+                    // likeIPs array, update and save it
+                    if (like && stockFromMongo._doc.likeIPs.indexOf(likeIP) === -1) {
+                      // add the new IP to the array of likeIPs
+                      stockFromMongo._doc.likeIPs.push(likeIP);
+                      // save the updated stock to mongo and return to client
+                      stockFromMongo.save()
+                        .then((savedStock) => {
+                          createStockObject(savedStock._doc, single, res)
+                        })
+                        .catch((err) => {
+                          return handleError(res, err);
+                        });
                       } else {
-                        // like IP already exists in array, don't need to re-save
+                        // not liked, OR like IP already exists in array, don't need to re-save
                         // just createStockObject and return to client
                         createStockObject(stockFromMongo._doc, single, res)
                       }
-                    } else {
-                      // (if it wasn't liked, there were no changes so don't need to re-save) 
-                      createStockObject(stockFromMongo._doc, single, res)
-                    }
                 }
               })
               .catch((err) => {
