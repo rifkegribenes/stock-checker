@@ -52,6 +52,12 @@ module.exports = function (app) {
        req.socket.remoteAddress ||
        req.connection.socket.remoteAddress).split(",")[0];
       let likeIPs = [];
+    
+      // here's where we'll save and compare the number of likes if two stocks are submitted
+      let likesCompare = [];
+    
+      // here's where result data goes if two stocks were submitted
+      let result = [];
 
       getStockData(stock)
         .then((data) => {
@@ -64,8 +70,11 @@ module.exports = function (app) {
               // if the stock is not yet in the db
                 if (!stockFromMongo) {
                   // if it was liked, save the liker's IP in the likeIPs array
+                  // and add a value of 1 (this is the first like for this stock) 
+                  // to the likesCompare array
                   if (like) {
                     likeIPs.push(likeIP);
+                    likesCompare.push(1);
                   }
                   // create the new stock object to save to mongo
                   let newStock = new Stock({
@@ -75,9 +84,16 @@ module.exports = function (app) {
                   });
                   // and save it
                   newStock.save()
-                    .then((stockData) => {
-                      // const stock = { ...stockData._doc };
-                      // stock.likes = stockData._doc.likeIPs.length;
+                    .then((stockInfoFromIEX) => {
+                      // create the result object and return to client
+                      const stockData = { ...stockInfoFromIEX._doc };
+                      stockData.likes = stockInfoFromIEX._doc.likeIPs.length;
+                      // if this was the only stock submitted, return it now
+                      if (single) {
+                        return res.status(200).json({ stockData });
+                      } else {
+                        // otherwise, 
+                      
                     })
                     .catch((err) => {
                       console.log(`api.js > get newStock.save ${err}`);
@@ -106,8 +122,11 @@ module.exports = function (app) {
                     } else {
                       // if it wasn't liked, 
                       // check if multiple stocks were submitted
-                      if (!single)
-                      // just get the number of likes to compare for response
+                      if (!single) {
+                        // get the number of likes to compare for response
+                
+                      }
+                      
                     }
             })
               .catch();
