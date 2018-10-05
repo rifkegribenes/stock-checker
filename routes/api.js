@@ -16,7 +16,7 @@ const handleError = (res, err) => {
   return res.status(500).json({message: err});
 }
 
-// here's where result data goes if two stocks were submitted
+// store result data if two stocks submitted
 let result = [];
 
 const getStockData = (stocks) => {
@@ -39,6 +39,23 @@ const getStockData = (stocks) => {
 
 }
 
+// takes in an array of two stock objects and returns a new array 
+// containing both objects with a new 'rel_likes' key replacing the original 'likes' key
+const formatStockData = data => {
+  // first map through the two objects and substitute the rel_likes value for the # of likes
+  const resultToReturn = data.map((stockObj, index) => {
+    // save a reference to the 'other stock' in the array
+    // (not the one being processed at this step in the map)
+    const otherStock = index === 0 ? result[1] : result[0];
+    // find the relative likes value by comparing this object to the otherStock
+    stockObj.rel_likes = stockObj.likes - otherStock.likes;
+    // then delete the likes key
+    delete stockObj.likes;
+    // return the updated stockObject
+    return { stockData: stockObj }
+  });
+}
+
 const saveStock = (stockToSave, single, res) => {
   stockToSave.save()
     .then((savedStock) => {
@@ -53,18 +70,7 @@ const saveStock = (stockToSave, single, res) => {
         result.push(stockData);
         // if the result array already has two stocks in it, it's time to return it
         if (result.length === 2) {
-          // first map through the two objects and substitute the rel_likes value for the # of likes
-          const resultToReturn = result.map((stockObj, index) => {
-            // save a reference to the 'other stock' in the array
-            // (not the one being processed at this step in the map)
-            const otherStock = index === 0 ? result[1] : result[0];
-            // find the relative likes value by comparing this object to the otherStock
-            stockObj.rel_likes = stockObj.likes - otherStock.likes;
-            // then delete the likes key
-            delete stockObj.likes;
-            // return the updated stockObject
-            return { stockData: stockObj }
-          });
+          const resultToReturn = formatStockData(result);
           // return this array of stockObjects to the client
           return res.status(200).json(resultToReturn);
         } else {
