@@ -49,8 +49,8 @@ const formatStockData = data => {
     const otherStock = index === 0 ? data[1] : data[0];
     // find the relative likes value by comparing this object to the otherStock
     stockObj.rel_likes = stockObj.likes - otherStock.likes;
-    // then delete the likes key
-    delete stockObj.likes;
+    console.log(`${otherStock.stock} likes = ${otherStock.likes}. ${stockObj.stock} likes = ${stockObj.likes}`);
+    console.log(`${stockObj.stock} rel_likes = ${stockObj.rel_likes}`);
     // return the updated stockObject
     return stockObj;
   });
@@ -78,7 +78,7 @@ const createStockObject = (stock, single, res) => {
     // otherwise, save it to the result array
     result.push(stockData);
     // if the result array already has two stocks in it, it's time to return it
-    console.log(`result.length: ${result.length});
+    console.log(`result.length: ${result.length}`);
     if (result.length === 2) {
       returnTwo(res);
     } else {
@@ -93,6 +93,8 @@ module.exports = function (app) {
   app.route('/api/stock-prices')
     .get((req, res) => {
       const { stock, like } = req.query;
+      // reset result array on each new api call
+      result = [];
       // if the stock query is not array, then 'single' is true
       let single = !Array.isArray(stock);
       
