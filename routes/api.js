@@ -41,13 +41,17 @@ module.exports = function (app) {
   app.route('/api/stock-prices')
     .get((req, res) => {
       const { stock, like } = req.query;
+      // if the stock query is not array, then 'single' is true
+      let single = !Array.isArray(stock);
+      console.log(stock);
+      console.log(single);
       
-    // get like IP
-    let likeIP = (req.headers['x-forwarded-for'] ||
-     req.connection.remoteAddress ||
-     req.socket.remoteAddress ||
-     req.connection.socket.remoteAddress).split(",")[0];
-    let likeIPs = [];
+      // get like IP
+      let likeIP = (req.headers['x-forwarded-for'] ||
+       req.connection.remoteAddress ||
+       req.socket.remoteAddress ||
+       req.connection.socket.remoteAddress).split(",")[0];
+      let likeIPs = [];
 
       getStockData(stock)
         .then((data) => {
@@ -81,9 +85,30 @@ module.exports = function (app) {
                     });
                   } else {
                   // if the stock already exists in mongo
+                  // make a copy to avoid mutation
+                    const updatedStock = { ...stockFromMongo._doc }
+                    // if the stock was liked, update and save it
                     if (like) {
-                      stockF
-                  }
+                      // if this IP does not already exist in the likeIPs array
+                      if (updatedStock.likeIPs.indexOf(likeIP) === -1) {
+                        // add the new IP to the array of likeIPs
+                        updatedStock.likeIPs.push(likeIP);
+                      }
+                      // save the updated stock to mongo
+                      updatedStock.save()
+                        .then((postUpdateStock) => {
+                      
+                        }) // holy shit this is too many $#^$^% nested callbacks
+                        .catch((err) => {
+                          console.log(`api.js > get updatedStock.save ${err}`);
+                          return handleError(res, err);
+                        });
+                    } else {
+                      // if it wasn't liked, 
+                      // check if multiple stocks were submitted
+                      if (!single)
+                      // just get the number of likes to compare for response
+                    }
             })
               .catch();
             
