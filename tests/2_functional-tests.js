@@ -8,8 +8,11 @@
 
 var chaiHttp = require('chai-http');
 var chai = require('chai');
+const mocha = require('mocha');
 var assert = chai.assert;
 var server = require('../server');
+
+const { suite, test } = mocha;
 
 chai.use(chaiHttp);
 
@@ -21,12 +24,14 @@ suite('Functional Tests', function() {
        chai.request(server)
         .get('/api/stock-prices')
         .query({stock: 'goog'})
-        .end(function(err, res){
-          
-          //complete this one too
-          
-          done();
-        });
+        .end((err, res) => {
+            assert.equal(res.status, 200);
+            assert.property(res.body, 'stock', 'StockData should contain stock');
+            assert.property(res.body, '_id', 'StockData should contain _id');
+            assert.property(res.body, 'price', 'StockData should contain price');
+            assert.equal(res.body.stock, 'goog');
+            done();
+          });
       });
       
       test('1 stock with like', function(done) {
