@@ -16,9 +16,8 @@ const { suite, test } = mocha;
 
 chai.use(chaiHttp);
 
-let _id1;
-let _id2;
 let likes;
+let rel_likes;
 
 suite('Functional Tests', function() {
     
@@ -32,7 +31,6 @@ suite('Functional Tests', function() {
             assert.equal(res.status, 200);
             assert.property(res.body, 'stock', 'StockData should contain stock');
             assert.property(res.body, '_id', 'StockData should contain _id');
-            _id1 = res.body._id;
             assert.property(res.body, 'price', 'StockData should contain price');
             assert.equal(res.body.stock, 'GOOG');
             done();
@@ -47,7 +45,6 @@ suite('Functional Tests', function() {
               assert.equal(res.status, 200);
               assert.property(res.body, 'stock', 'StockData should contain stock');
               assert.property(res.body, '_id', 'StockData should contain _id');
-              _id1 = res.body._id;
               assert.property(res.body, 'price', 'StockData should contain price');
               assert.property(res.body, 'likes', 'StockData should contain likes');
               assert.isAtLeast(res.body.likes, 1, 'likes should be at least 1');
@@ -65,7 +62,6 @@ suite('Functional Tests', function() {
               assert.equal(res.status, 200);
               assert.property(res.body, 'stock', 'StockData should contain stock');
               assert.property(res.body, '_id', 'StockData should contain _id');
-              _id1 = res.body._id;
               assert.property(res.body, 'price', 'StockData should contain price');
               assert.property(res.body, 'likes', 'StockData should contain likes');
               assert.isAtLeast(res.body.likes, 1, 'likes should be at least 1');
@@ -84,10 +80,16 @@ suite('Functional Tests', function() {
               assert.isArray(res.body, 'Res.body should be an array');
               assert.property(res.body[0], 'stock', 'Each StockData object should contain stock');
               assert.property(res.body[0], '_id', 'Each StockData object should contain _id');
-              _id2 = res.body[0]._id;
               assert.property(res.body[0], 'price', 'Each StockData object should contain price');
               assert.property(res.body[0], 'rel_likes', 'Each StockData object should contain rel_likes');
-              assert.equal(res.body[0].stock, 'AAPL');
+              assert.property(res.body[1], 'stock', 'Each StockData object should contain stock');
+              assert.property(res.body[1], 'price', 'Each StockData object should contain price');
+              assert.property(res.body[1], 'rel_likes', 'Each StockData object should contain rel_likes');
+              assert.property(res.body[1], '_id', 'Each StockData object should contain _id');
+              assert.oneOf(res.body[0].stock, ['AAPL','GOOG']);
+              assert.oneOf(res.body[1].stock, ['AAPL','GOOG']);
+              assert.equal(res.body.stockData[0].rel_likes + res.body.stockData[1].rel_likes, 0);
+              rel_likes = Math.abs(res.body.stockData[0].rel_likes);
               done();
             });
       });
@@ -98,14 +100,19 @@ suite('Functional Tests', function() {
           .query({stock: ['aapl', 'goog']})
           .end((err, res) => {
               assert.equal(res.status, 200);
-              assert.isArray(res.body, 'Res.body should be an array');
+              assert.isArray(res.body);
               assert.property(res.body[0], 'stock', 'Each StockData object should contain stock');
               assert.property(res.body[0], '_id', 'Each StockData object should contain _id');
-              _id2 = res.body[0]._id;
               assert.property(res.body[0], 'price', 'Each StockData object should contain price');
               assert.property(res.body[0], 'rel_likes', 'Each StockData object should contain rel_likes');
-              assert.isAtLeast(res.body.likes, 1, 'likes should be at least 1');
-              assert.equal(res.body[0].stock, 'AAPL');
+              assert.property(res.body[1], 'stock', 'Each StockData object should contain stock');
+              assert.property(res.body[1], 'price', 'Each StockData object should contain price');
+              assert.property(res.body[1], 'rel_likes', 'Each StockData object should contain rel_likes');
+              assert.property(res.body[1], '_id', 'Each StockData object should contain _id');
+              assert.oneOf(res.body[0].stock, ['AAPL','GOOG']);
+              assert.oneOf(res.body[1].stock, ['AAPL','GOOG']);
+              assert.equal(res.body[0].rel_likes + res.body[1].rel_likes, 0);
+              assert.equal(Math.abs(res.body[0].rel_likes),rel_likes);
               done();
             }); 
       });
