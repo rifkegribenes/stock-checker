@@ -19,7 +19,6 @@ chai.use(chaiHttp);
 let _id1;
 let _id2;
 let firstLikes;
-let secondLikes;
 
 suite('Functional Tests', function() {
     
@@ -52,6 +51,7 @@ suite('Functional Tests', function() {
               assert.property(res.body, 'price', 'StockData should contain price');
               assert.property(res.body, 'likes', 'StockData should contain likes');
               assert.isAtLeast(res.body.likes, 1, 'likes should be at least 1');
+              firstLikes = res.body.likes;
               assert.equal(res.body.stock, 'GOOG');
               done();
             });
@@ -69,6 +69,7 @@ suite('Functional Tests', function() {
               assert.property(res.body, 'price', 'StockData should contain price');
               assert.property(res.body, 'likes', 'StockData should contain likes');
               assert.isAtLeast(res.body.likes, 1, 'likes should be at least 1');
+              assert.equal(res.body.likes, firstLikes);
               assert.equal(res.body.stock, 'GOOG');
               done();
             });
