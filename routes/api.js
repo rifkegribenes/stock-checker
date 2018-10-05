@@ -49,8 +49,7 @@ const formatStockData = data => {
     const otherStock = index === 0 ? data[1] : data[0];
     // find the relative likes value by comparing this object to the otherStock
     stockObj.rel_likes = stockObj.likes - otherStock.likes;
-    console.log(`${otherStock.stock} likes = ${otherStock.likes}. ${stockObj.stock} likes = ${stockObj.likes}`);
-    console.log(`${stockObj.stock} rel_likes = ${stockObj.rel_likes}`);
+    console.log('52');
     // return the updated stockObject
     return stockObj;
   });
@@ -62,8 +61,7 @@ const returnSingle = (stockData, res) => {
 
 const returnTwo = res => {
   const resultToReturn = formatStockData(result);
-  console.log('return to client');
-  console.log(resultToReturn);
+  console.log('64');
   res.status(200).json(resultToReturn);
 }
 
@@ -74,11 +72,11 @@ const createStockObject = (stock, single, res) => {
   if (single) {
     returnSingle(stockData, res);
   } else {
-    console.log('pushing to result array');
+    console.log('75');
     // otherwise, save it to the result array
     result.push(stockData);
     // if the result array already has two stocks in it, it's time to return it
-    console.log(`result.length: ${result.length}`);
+    console.log('79');
     if (result.length === 2) {
       returnTwo(res);
     } else {
@@ -108,17 +106,17 @@ module.exports = function (app) {
       getStockData(stock)
         .then((data) => {
           const stockList = Object.keys(data);
-          console.log(stockList);
+          console.log('111');
           let stockDataReturnArray = [];
           stockList.forEach((stockKey) => {
-            console.log(`${stockKey}: stockKey`);
+            console.log('114');
             let stockKeyUpper = stockKey.toUpperCase();
             Stock.findOne({ stock: stockKeyUpper })
               .then((stockFromMongo) => {
  
               // if the stock is not yet in the db
                 if (!stockFromMongo) {
-                  console.log(`no matching stock found for ${stockKeyUpper}, saving new`);
+                  console.log('121');
                   // if it was liked, save the liker's IP in the likeIPs array
                   if (like) {
                     likeIPs.push(likeIP);
@@ -138,12 +136,18 @@ module.exports = function (app) {
                     });
                 } else { // if the stock already exists in mongo
                     // if the stock was liked, update and save it
-                  console.log(`${stockKeyUpper} already exists, updating and re-saving`);
                     if (like) {
+                      console.log('_doc');
+                      console.log(stockFromMongo._doc.likeIPs);
+                      console.log('no _doc');
+                      console.log(stockFromMongo.likeIPs);
                       // if this IP does not already exist in the likeIPs array
-                      if (stockFromMongo.likeIPs.indexOf(likeIP) === -1) {
+                      if (stockFromMongo._doc.likeIPs.indexOf(likeIP) === -1) {
                         // add the new IP to the array of likeIPs
-                        stockFromMongo.likeIPs.push(likeIP);
+                        stockFromMongo._doc.likeIPs.push(likeIP);
+                        console.log('_doc after push');
+                        
+                        console.log(stockFromMongo._doc.likeIPs);
                         // save the updated stock to mongo and return to client
                         stockFromMongo.save()
                           .then(savedStock => createStockObject(savedStock._doc, single, res))
