@@ -49,7 +49,7 @@ suite('Functional Tests', function() {
               _id1 = res.body._id;
               assert.property(res.body, 'price', 'StockData should contain price');
               assert.property(res.body, 'likes', 'StockData should contain likes');
-              assert.isAtLeast(res.body.likes.length, 1, 'likes array should contain at least IP address');
+              assert.isAtLeast(res.body.likes, 1, 'likes should be at least 1');
               assert.equal(res.body.stock, 'GOOG');
               done();
             });

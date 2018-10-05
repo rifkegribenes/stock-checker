@@ -69,6 +69,7 @@ const returnTwo = res => {
 
 const createStockObject = (stock, single, res) => {
   const stockData = { ...stock }
+  console.log('is there a price in this object?');
   console.log(stockData);
   stockData.likes = stock.likeIPs.length;
   // if this was the only stock submitted, return it now
