@@ -76,7 +76,20 @@ suite('Functional Tests', function() {
       });
       
       test('2 stocks', function(done) {
-        
+        chai.request(server)
+          .get('/api/stock-prices')
+          .query({stock: ['aapl', 'goog']})
+          .end((err, res) => {
+              assert.equal(res.status, 200);
+              assert.isArray(res.body, 'Res.body should be an array');
+              assert.property(res.body[0], 'stock', 'Each StockData object should contain stock');
+              assert.property(res.body[0], '_id', 'Each StockData object should contain _id');
+              _id2 = res.body[0]._id;
+              assert.property(res.body[0], 'price', 'Each StockData object should contain price');
+              assert.property(res.body[0], 'rel_likes', 'Each StockData object should contain rel_likes');
+              assert.equal(res.body[0].stock, 'AAPL');
+              done();
+            });
       });
       
       test('2 stocks with like', function(done) {
