@@ -110,7 +110,11 @@ module.exports = function (app) {
           console.log(stockList);
           let stockDataReturnArray = [];
           stockList.forEach((stockKey) => {
-            Stock.findOne({ stock: stockKey })
+            const target = { stock: stockKey };
+            const updates = { };
+            const options = { new: true };
+
+            Stock.findOneAndUpdate(target, updates, options)
               .then((stockFromMongo) => {
               // if the stock is not yet in the db
                 if (!stockFromMongo) {
@@ -138,11 +142,11 @@ module.exports = function (app) {
                     // if the stock was liked, update and save it
                     if (like) {
                       // if this IP does not already exist in the likeIPs array
-                      if (updatedStock._doc.likeIPs.indexOf(likeIP) === -1) {
+                      if (stockFromMongo._doc.likeIPs.indexOf(likeIP) === -1) {
                         // add the new IP to the array of likeIPs
-                        updatedStock._doc.likeIPs.push(likeIP);
+                        stockFromMongo._doc.likeIPs.push(likeIP);
                         // save the updated stock to mongo and return to client
-                        updatedStock.save()
+                        stockFromMongo.save()
                           .then(savedStock => createStockObject(savedStock._doc, single, res))
                           .catch((err) => {
                             console.log(`api.js > get stockToSave.save ${err}`);

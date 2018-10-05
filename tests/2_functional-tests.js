@@ -39,7 +39,20 @@ suite('Functional Tests', function() {
       });
       
       test('1 stock with like', function(done) {
-        
+        chai.request(server)
+          .get('/api/stock-prices')
+          .query({stock: 'goog', like: true})
+          .end((err, res) => {
+              assert.equal(res.status, 200);
+              assert.property(res.body, 'stock', 'StockData should contain stock');
+              assert.property(res.body, '_id', 'StockData should contain _id');
+              _id1 = res.body._id;
+              assert.property(res.body, 'price', 'StockData should contain price');
+              assert.property(res.body, 'likes', 'StockData should contain likes');
+              assert.isAtLeast(res.body.likes.length, 1, 'likes array should contain at least IP address');
+              assert.equal(res.body.stock, 'GOOG');
+              done();
+            });
       });
       
       test('1 stock with like again (ensure likes arent double counted)', function(done) {
