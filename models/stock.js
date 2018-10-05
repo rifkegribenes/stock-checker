@@ -7,7 +7,7 @@ const StockSchema = new Schema({
     required: true
   },
   price: String,
-  likesIPs: [{ type: String }]
+  likeIPs: [{ type: String }]
 });
 
 module.exports = mongoose.model('Stock', StockSchema);

@@ -41,6 +41,13 @@ module.exports = function (app) {
   app.route('/api/stock-prices')
     .get((req, res) => {
       const { stock, like } = req.query;
+      
+    // get like IP
+    let likeIP = (req.headers['x-forwarded-for'] ||
+     req.connection.remoteAddress ||
+     req.socket.remoteAddress ||
+     req.connection.socket.remoteAddress).split(",")[0];
+    let likeIPs = [];
 
       getStockData(stock)
         .then((data) => {
@@ -50,23 +57,33 @@ module.exports = function (app) {
           stockList.forEach((stockKey) => {
             Stock.findOne({ stock: stockKey })
               .then((stockFromMongo) => {
+              // if the stock is not yet in the db
                 if (!stockFromMongo) {
+                  // if it was liked, save the liker's IP in the likeIPs array
+                  if (like) {
+                    likeIPs.push(likeIP);
+                  }
+                  // create the new stock object to save to mongo
                   let newStock = new Stock({
-                    stock,
+                    stock: stockKey,
                     price: data[stockKey].quote.iexRealtimePrice,
-                    likesIPs: []
+                    likeIPs
                   });
-          newStock.save()
-            .then((stockData) => {
-              const stock = { ...stockData._doc };
-              stock.likes = stockData._doc.likesIPs.length;
-              return res.status(200).json(stock);
-            })
-            .catch((err) => {
-              console.log(`api.js > get newStock.save ${err}`);
-              return handleError(res, err);
-            });
-                }
+                  // and save it
+                  newStock.save()
+                    .then((stockData) => {
+                      // const stock = { ...stockData._doc };
+                      // stock.likes = stockData._doc.likeIPs.length;
+                    })
+                    .catch((err) => {
+                      console.log(`api.js > get newStock.save ${err}`);
+                      return handleError(res, err);
+                    });
+                  } else {
+                  // if the stock already exists in mongo
+                    if (like) {
+                      stockF
+                  }
             })
               .catch();
             
