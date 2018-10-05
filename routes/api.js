@@ -49,7 +49,6 @@ const formatStockData = data => {
     const otherStock = index === 0 ? data[1] : data[0];
     // find the relative likes value by comparing this object to the otherStock
     stockObj.rel_likes = stockObj.likes - otherStock.likes;
-    console.log('52');
     // return the updated stockObject
     return stockObj;
   });
@@ -61,23 +60,19 @@ const returnSingle = (stockData, res) => {
 
 const returnTwo = res => {
   const resultToReturn = formatStockData(result);
-  console.log('64');
   res.status(200).json(resultToReturn);
 }
 
 const createStockObject = (stock, single, res) => {
-  console.log('69');
   const stockData = { ...stock }
   stockData.likes = stock.likeIPs.length;
   // if this was the only stock submitted, return it now
   if (single) {
     returnSingle(stockData, res);
   } else {
-    console.log('75');
     // otherwise, save it to the result array
     result.push(stockData);
     // if the result array already has two stocks in it, it's time to return it
-    console.log(result.length);
     if (result.length == 2) {
       returnTwo(res);
     } else {
@@ -107,12 +102,9 @@ module.exports = function (app) {
       getStockData(stock)
         .then((data) => {
           const stockList = Object.keys(data);
-          console.log('111');
           let stockDataReturnArray = [];
           stockList.forEach((stockKey) => {
-            console.log('114');
             let stockKeyUpper = stockKey.toUpperCase();
-            console.log(`stockKeyUpper: ${stockKeyUpper}`);
             Stock.findOne({ stock: stockKeyUpper })
               .then((stockFromMongo) => {
  
@@ -141,20 +133,20 @@ module.exports = function (app) {
                     if (like) {
                       // if this IP does not already exist in the likeIPs array
                       if (stockFromMongo._doc.likeIPs.indexOf(likeIP) === -1) {
-                        console.log('143');
                         // add the new IP to the array of likeIPs
                         stockFromMongo._doc.likeIPs.push(likeIP);
-                        console.log('146');
                         // save the updated stock to mongo and return to client
                         stockFromMongo.save()
                           .then((savedStock) => {
-                            console.log('150');
                             createStockObject(savedStock._doc, single, res)
                           })
                           .catch((err) => {
-                            console.log(`api.js > get stockToSave.save ${err}`);
                             return handleError(res, err);
                           });
+                      } else {
+                        // like IP already exists in array, don't need to re-save
+                        // just createStockObject and return to client
+                        createStockObject(stockFromMongo._doc, single, res)
                       }
                     } else {
                       // (if it wasn't liked, there were no changes so don't need to re-save) 
