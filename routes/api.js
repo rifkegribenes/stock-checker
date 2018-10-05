@@ -62,7 +62,9 @@ const returnSingle = (stockData, res) => {
 
 const returnTwo = res => {
   const resultToReturn = formatStockData(result);
-  return res.status(200).json(resultToReturn);
+  console.log('return to client');
+  console.log(resultToReturn);
+  res.status(200).json(resultToReturn);
 }
 
 const createStockObject = (stock, single, res) => {
@@ -72,9 +74,11 @@ const createStockObject = (stock, single, res) => {
   if (single) {
     returnSingle(stockData, res);
   } else {
+    console.log('pushing to result array');
     // otherwise, save it to the result array
     result.push(stockData);
     // if the result array already has two stocks in it, it's time to return it
+    console.log(`result.length: ${result.length});
     if (result.length === 2) {
       returnTwo(res);
     } else {

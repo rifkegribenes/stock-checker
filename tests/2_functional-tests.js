@@ -88,8 +88,8 @@ suite('Functional Tests', function() {
               assert.property(res.body[1], '_id', 'Each StockData object should contain _id');
               assert.oneOf(res.body[0].stock, ['AAPL','GOOG']);
               assert.oneOf(res.body[1].stock, ['AAPL','GOOG']);
-              assert.equal(res.body.stockData[0].rel_likes + res.body.stockData[1].rel_likes, 0);
-              rel_likes = Math.abs(res.body.stockData[0].rel_likes);
+              assert.equal(res.body[0].rel_likes + res.body[1].rel_likes, 0);
+              rel_likes = Math.abs(res.body[0].rel_likes);
               done();
             });
       });
@@ -97,7 +97,7 @@ suite('Functional Tests', function() {
       test('2 stocks with like', function(done) {
         chai.request(server)
           .get('/api/stock-prices')
-          .query({stock: ['aapl', 'goog']})
+          .query({stock: ['aapl', 'goog'], like: true})
           .end((err, res) => {
               assert.equal(res.status, 200);
               assert.isArray(res.body);
