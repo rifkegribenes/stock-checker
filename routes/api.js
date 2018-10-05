@@ -16,6 +16,12 @@ const handleError = (res, err) => {
   return res.status(500).json({message: err});
 }
 
+// here's where we'll save and compare the number of likes if two stocks are submitted
+let likesCompare = [];
+
+// here's where result data goes if two stocks were submitted
+let result = [];
+
 const getStockData = (stocks) => {
 
   return new Promise((resolve, reject) => {
@@ -36,6 +42,35 @@ const getStockData = (stocks) => {
 
 }
 
+const saveStock = (stockToSave, single) => {
+  stockToSave.save()
+    .then((savedStock) => {
+      // create the result object and return to client
+      const stockData = { ...savedStock._doc };
+      stockData.likes = savedStock._doc.likeIPs.length;
+      // if this was the only stock submitted, return it now
+      if (single) {
+        return res.status(200).json({ stockData });
+      } else {
+        // otherwise, save it to the result object
+        result.push(stockData);
+        // if the result array already has two stocks in it, it's time to return it
+        if (result.length === 2) {
+          // first map through the two objects and substitute the likesCompare value for the # of likes
+          const resultToReturn = result.map((stockObj) => {
+            // for each stock object
+            // find the relative likes value
+            stockObj
+          }
+        }
+      }
+    })
+    .catch((err) => {
+      console.log(`api.js > get newStock.save ${err}`);
+      return handleError(res, err);
+    });
+  }
+
 module.exports = function (app) {
 
   app.route('/api/stock-prices')
@@ -52,12 +87,6 @@ module.exports = function (app) {
        req.socket.remoteAddress ||
        req.connection.socket.remoteAddress).split(",")[0];
       let likeIPs = [];
-    
-      // here's where we'll save and compare the number of likes if two stocks are submitted
-      let likesCompare = [];
-    
-      // here's where result data goes if two stocks were submitted
-      let result = [];
 
       getStockData(stock)
         .then((data) => {
@@ -83,22 +112,7 @@ module.exports = function (app) {
                     likeIPs
                   });
                   // and save it
-                  newStock.save()
-                    .then((stockInfoFromIEX) => {
-                      // create the result object and return to client
-                      const stockData = { ...stockInfoFromIEX._doc };
-                      stockData.likes = stockInfoFromIEX._doc.likeIPs.length;
-                      // if this was the only stock submitted, return it now
-                      if (single) {
-                        return res.status(200).json({ stockData });
-                      } else {
-                        // otherwise, 
-                      
-                    })
-                    .catch((err) => {
-                      console.log(`api.js > get newStock.save ${err}`);
-                      return handleError(res, err);
-                    });
+                  
                   } else {
                   // if the stock already exists in mongo
                   // make a copy to avoid mutation
@@ -111,14 +125,23 @@ module.exports = function (app) {
                         updatedStock.likeIPs.push(likeIP);
                       }
                       // save the updated stock to mongo
-                      updatedStock.save()
-                        .then((postUpdateStock) => {
-                      
-                        }) // holy shit this is too many $#^$^% nested callbacks
-                        .catch((err) => {
-                          console.log(`api.js > get updatedStock.save ${err}`);
-                          return handleError(res, err);
-                        });
+                     updatedStock.save()
+                      .then((savedStock) => {
+                        // create the result object and return to client
+                        const stockData = { ...savedStock._doc };
+                        stockData.likes = savedStock._doc.likeIPs.length;
+                        // if this was the only stock submitted, return it now
+                        if (single) {
+                          return res.status(200).json({ stockData });
+                        } else {
+                          // otherwise, save it to the result object to return later
+                          result.push(stockData);
+                        }
+                      })
+                      .catch((err) => {
+                        console.log(`api.js > get newStock.save ${err}`);
+                        return handleError(res, err);
+                      });
                     } else {
                       // if it wasn't liked, 
                       // check if multiple stocks were submitted
@@ -128,6 +151,7 @@ module.exports = function (app) {
                       }
                       
                     }
+                  }
             })
               .catch();
             
