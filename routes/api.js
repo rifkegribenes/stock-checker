@@ -57,8 +57,6 @@ const formatStockData = data => {
 }
 
 const returnSingle = (stockData, res) => {
-  console.log('this will be returned to client:');
-  console.log(stockData);
   res.status(200).json(stockData);
 }
 
@@ -69,8 +67,6 @@ const returnTwo = res => {
 
 const createStockObject = (stock, single, res) => {
   const stockData = { ...stock }
-  console.log('is there a price in this object?');
-  console.log(stockData);
   stockData.likes = stock.likeIPs.length;
   // if this was the only stock submitted, return it now
   if (single) {
@@ -95,8 +91,6 @@ module.exports = function (app) {
       const { stock, like } = req.query;
       // if the stock query is not array, then 'single' is true
       let single = !Array.isArray(stock);
-      console.log(stock);
-      console.log(single);
       
       // get like IP
       let likeIP = (req.headers['x-forwarded-for'] ||
