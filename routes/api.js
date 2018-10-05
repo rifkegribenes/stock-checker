@@ -16,6 +16,11 @@ const handleError = (res, err) => {
   return res.status(500).json({message: err});
 }
 
+const getLikeIP = req => (req.headers['x-forwarded-for'] ||
+  req.connection.remoteAddress ||
+  req.socket.remoteAddress ||
+  req.connection.socket.remoteAddress).split(",")[0];
+
 // store result data if two stocks submitted
 let result = [];
 
@@ -93,24 +98,17 @@ module.exports = function (app) {
       let single = !Array.isArray(stock);
       
       // get like IP
-      let likeIP = (req.headers['x-forwarded-for'] ||
-       req.connection.remoteAddress ||
-       req.socket.remoteAddress ||
-       req.connection.socket.remoteAddress).split(",")[0];
-      let likeIPs = [];
+      let likeIP = getLikeIP(req);
 
       getStockData(stock)
         .then((data) => {
-          const stockList = Object.keys(data);
-          let stockDataReturnArray = [];
-          stockList.forEach((stockKey) => {
-            let stockKeyUpper = stockKey.toUpperCase();
-            Stock.findOne({ stock: stockKeyUpper })
+          Object.keys(data).forEach((stockKey) => {
+            Stock.findOne({ stock: stockKey })
               .then((stockFromMongo) => {
- 
               // if the stock is not yet in the db
                 if (!stockFromMongo) {
                   // if it was liked, save the liker's IP in the likeIPs array
+                  let likeIPs = [];
                   if (like) {
                     likeIPs.push(likeIP);
                   }
@@ -120,14 +118,14 @@ module.exports = function (app) {
                     price: data[stockKey].quote.iexRealtimePrice,
                     likeIPs
                   });
-                  // and save it
+                  // save it
                   newStock.save()
                     .then(savedStock => createStockObject(savedStock._doc, single, res))
                     .catch((err) => {
                       console.log(`api.js > get stockToSave.save ${err}`);
                       return handleError(res, err);
                     });
-                } else { // if the stock already exists in mongo
+                } else { // if stock already exists in mongo
                     // if the stock was liked, and if IP does not already exist in 
                     // likeIPs array, update and save it
                     if (like && stockFromMongo._doc.likeIPs.indexOf(likeIP) === -1) {
