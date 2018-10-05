@@ -56,32 +56,36 @@ const formatStockData = data => {
   });
 }
 
-const createStockObject = (stock, single, res) => {
-        stock.likes = stock.likeIPs.length;
-        // if this was the only stock submitted, return it now
-        if (single) {
-          return res.status(200).json({ stockData });
-        } else {
-          // otherwise, save it to the result array
-          result.push(stockData);
-          // if the result array already has two stocks in it, it's time to return it
-          if (result.length === 2) {
-            const resultToReturn = formatStockData(result);
-            // return this array of stockObjects to the client
-            return res.status(200).json(resultToReturn);
-          } else {
-            // otherwise, just return out of this function and continue
-            return;
-          }
-        }
-      })
-      .catch((err) => {
-        console.log(`api.js > get newStock.save ${err}`);
-        return handleError(res, err);
-      });
-  }
+const returnSingle = (stockData, res) => {
+  console.log('this will be returned to client:');
+  console.log(stockData);
+  res.status(200).json(stockData);
+}
 
+const returnTwo = res => {
+  const resultToReturn = formatStockData(result);
+  return res.status(200).json(resultToReturn);
+}
+
+const createStockObject = (stock, single, res) => {
+  const stockData = { ...stock }
+  console.log(stockData);
+  stockData.likes = stock.likeIPs.length;
+  // if this was the only stock submitted, return it now
+  if (single) {
+    returnSingle(stockData, res);
+  } else {
+    // otherwise, save it to the result array
+    result.push(stockData);
+    // if the result array already has two stocks in it, it's time to return it
+    if (result.length === 2) {
+      returnTwo(res);
+    } else {
+      // otherwise, just return out of this function and continue
+      return;
+    }
   }
+}
 
 module.exports = function (app) {
 
@@ -122,7 +126,7 @@ module.exports = function (app) {
                   });
                   // and save it
                   newStock.save()
-                    .then(savedStock._doc => createStockObject(savedStock, single, res))
+                    .then(savedStock => createStockObject(savedStock._doc, single, res))
                     .catch((err) => {
                       console.log(`api.js > get stockToSave.save ${err}`);
                       return handleError(res, err);
@@ -139,16 +143,17 @@ module.exports = function (app) {
                         updatedStock._doc.likeIPs.push(likeIP);
                         // save the updated stock to mongo and return to client
                         updatedStock.save()
-                        .then(savedStock._doc => createStockObject(savedStock, single, res))
-                        .catch((err) => {
-                          console.log(`api.js > get stockToSave.save ${err}`);
-                          return handleError(res, err);
-                        });
+                          .then(savedStock => createStockObject(savedStock._doc, single, res))
+                          .catch((err) => {
+                            console.log(`api.js > get stockToSave.save ${err}`);
+                            return handleError(res, err);
+                          });
                       }
                     } else {
                       // (if it wasn't liked, there were no changes so don't need to re-save) 
                       createStockObject(stockFromMongo._doc, single, res)
                     }
+                }
               })
               .catch((err) => {
                 console.log(`api.js > get Stock.findOne ${err}`);

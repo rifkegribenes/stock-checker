@@ -33,7 +33,7 @@ suite('Functional Tests', function() {
             assert.property(res.body, '_id', 'StockData should contain _id');
             _id1 = res.body._id;
             assert.property(res.body, 'price', 'StockData should contain price');
-            assert.equal(res.body.stock, 'goog');
+            assert.equal(res.body.stock, 'GOOG');
             done();
           });
       });
