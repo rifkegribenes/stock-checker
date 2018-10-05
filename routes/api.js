@@ -43,20 +43,16 @@ const getStockData = (stocks) => {
 // containing both objects with a new 'rel_likes' key replacing the original 'likes' key
 const formatStockData = data => {
   // first map through the two objects and substitute the rel_likes value for the # of likes
-  console.log('this is what the result array looks like:');
-  console.log(data);
-  const resultToReturn = data.map((stockObj, index) => {
+  return data.map((stockObj, index) => {
     // save a reference to the 'other stock' in the array
     // (not the one being processed at this step in the map)
     const otherStock = index === 0 ? data[1] : data[0];
-    console.log('otherStock:');
-    console.log(otherStock.stock);
     // find the relative likes value by comparing this object to the otherStock
     stockObj.rel_likes = stockObj.likes - otherStock.likes;
     // then delete the likes key
     delete stockObj.likes;
     // return the updated stockObject
-    return { stockData: stockObj }
+    return stockObj;
   });
 }
 
@@ -66,8 +62,6 @@ const returnSingle = (stockData, res) => {
 
 const returnTwo = res => {
   const resultToReturn = formatStockData(result);
-  console.log('this will be returned to client');
-  console.log(resultToReturn);
   return res.status(200).json(resultToReturn);
 }
 
