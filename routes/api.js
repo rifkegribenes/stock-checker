@@ -53,10 +53,18 @@ module.exports = function (app) {
           const newStock = new Stock({
             stock,
             price,
-            likes: 0
+            likesIPs: []
           });
           newStock.save()
-            .then((stock) => {
+            .then((stockData) => {
+              console.log('stockData: 60');
+              console.log(stockData);
+              const stock = { ...stockData.doc };
+              console.log('stock: 62');
+              console.log(stock);
+              stock.likes = stockData.likesIPs.length;
+              console.log('stock: 64');
+              console.log(stock);
               return res.status(200).json(stock);
             })
             .catch((err) => {

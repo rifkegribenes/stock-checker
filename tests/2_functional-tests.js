@@ -16,6 +16,9 @@ const { suite, test } = mocha;
 
 chai.use(chaiHttp);
 
+let _id1;
+let _id2;
+
 suite('Functional Tests', function() {
     
     suite('GET /api/stock-prices => stockData object', function() {
@@ -28,6 +31,7 @@ suite('Functional Tests', function() {
             assert.equal(res.status, 200);
             assert.property(res.body, 'stock', 'StockData should contain stock');
             assert.property(res.body, '_id', 'StockData should contain _id');
+            _id1 = res.body._id;
             assert.property(res.body, 'price', 'StockData should contain price');
             assert.equal(res.body.stock, 'goog');
             done();
