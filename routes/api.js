@@ -16,9 +16,10 @@ const handleError = (res, err) => {
   return res.status(500).json({message: err});
 }
 
-const getStockData = (stock) => {
+const getStockData = (stocks) => {
   
-  console.log(`stock: ${stock}`);
+  console.log(`stocks: ${stocks}`);
+  if (isArray(stocks))
 
   return new Promise((resolve, reject) => {
     const now = new Date();
@@ -26,7 +27,8 @@ const getStockData = (stock) => {
     const MM = now.getMonth() + 1;
     const DD = now.getDate();
     
-    const url = `https://api.iextrading.com/1.0/stock/${stock}/batch?types=quote&last=1`;
+    const urlSingle = `https://api.iextrading.com/1.0/stock/${stock}/batch?types=quote&last=1`;
+    const urlMultiple = `https://api.iextrading.com/1.0/stock/market/batch?symbols=${stocks}&types=quote&last=1`;
 
     utils.getContent(url)
       .then((data) => {
@@ -57,14 +59,8 @@ module.exports = function (app) {
           });
           newStock.save()
             .then((stockData) => {
-              console.log('stockData: 60');
-              console.log(stockData);
-              const stock = { ...stockData.doc };
-              console.log('stock: 62');
-              console.log(stock);
-              stock.likes = stockData.likesIPs.length;
-              console.log('stock: 64');
-              console.log(stock);
+              const stock = { ...stockData._doc };
+              stock.likes = stockData._doc.likesIPs.length;
               return res.status(200).json(stock);
             })
             .catch((err) => {
