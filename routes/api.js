@@ -39,7 +39,7 @@ const getStockData = (stocks) => {
 
 }
 
-const saveStock = (stockToSave, single) => {
+const saveStock = (stockToSave, single, res) => {
   stockToSave.save()
     .then((savedStock) => {
       // create the stockData object to return to client
@@ -117,8 +117,8 @@ module.exports = function (app) {
                     likeIPs
                   });
                   // and save it
-                  saveStock(newStock, single);
-                  } else {
+                  saveStock(newStock, single, res);
+                } else {
                   // if the stock already exists in mongo
                   // make a copy to avoid mutation
                     const updatedStock = { ...stockFromMongo._doc }
@@ -129,39 +129,18 @@ module.exports = function (app) {
                         // add the new IP to the array of likeIPs
                         updatedStock.likeIPs.push(likeIP);
                       }
-                      // save the updated stock to mongo
-                     updatedStock.save()
-                      .then((savedStock) => {
-                        // create the result object and return to client
-                        const stockData = { ...savedStock._doc };
-                        stockData.likes = savedStock._doc.likeIPs.length;
-                        // if this was the only stock submitted, return it now
-                        if (single) {
-                          return res.status(200).json({ stockData });
-                        } else {
-                          // otherwise, save it to the result object to return later
-                          result.push(stockData);
-                        }
-                      })
-                      .catch((err) => {
-                        console.log(`api.js > get newStock.save ${err}`);
-                        return handleError(res, err);
-                      });
-                    } else {
-                      // if it wasn't liked, 
-                      // check if multiple stocks were submitted
-                      if (!single) {
-                        // get the number of likes to compare for response
-                
-                      }
-                      
                     }
+                    // save the updated stock to mongo
+                    // if it wasn't liked, there were no changes but re-save to 
+                    // return the relative likes if necessary
+                    saveStock(updatedStock, single, res);
                   }
-            })
-              .catch();
-            
-          }
-                 
+              })
+              .catch((err) => {
+                console.log(`api.js > get Stock.findOne ${err}`);
+                return handleError(res, err);
+              });
+          });       
         })
         .catch((err) => {
           console.log(`api.js > get utils.getContent ${err}`);
