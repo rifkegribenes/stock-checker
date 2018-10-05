@@ -17,9 +17,6 @@ const handleError = (res, err) => {
 }
 
 const getStockData = (stocks) => {
-  
-  console.log(`stocks: ${stocks}`);
-  if (isArray(stocks))
 
   return new Promise((resolve, reject) => {
     const now = new Date();
@@ -27,12 +24,11 @@ const getStockData = (stocks) => {
     const MM = now.getMonth() + 1;
     const DD = now.getDate();
     
-    const urlSingle = `https://api.iextrading.com/1.0/stock/${stock}/batch?types=quote&last=1`;
-    const urlMultiple = `https://api.iextrading.com/1.0/stock/market/batch?symbols=${stocks}&types=quote&last=1`;
-
+    const url = `https://api.iextrading.com/1.0/stock/market/batch?symbols=${stocks}&types=quote&last=1`;
+    
     utils.getContent(url)
       .then((data) => {
-        resolve(data.quote.iexRealtimePrice);
+        resolve(data);
       })
       .catch((err) => {
         console.log('api.js > getStockData utils.getContent');
@@ -51,7 +47,14 @@ module.exports = function (app) {
       const { stock } = req.query;
 
       getStockData(stock)
-        .then((price) => {
+        .then((data) => {
+          const stockList = Object.keys(data);
+          console.log(stockList);
+          let stockDataArray = [];
+          stockList.forEach((stockObj) => {
+            stockDataArray
+          }
+         data.quote.iexRealtimePrice
           const newStock = new Stock({
             stock,
             price,
