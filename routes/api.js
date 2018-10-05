@@ -111,10 +111,14 @@ module.exports = function (app) {
           console.log(stockList);
           let stockDataReturnArray = [];
           stockList.forEach((stockKey) => {
-            Stock.findOne({ stock: stockKey.toUpperCase })
+            console.log(`${stockKey}: stockKey`);
+            let stockKeyUpper = stockKey.toUpperCase();
+            Stock.findOne({ stock: stockKeyUpper })
               .then((stockFromMongo) => {
+ 
               // if the stock is not yet in the db
                 if (!stockFromMongo) {
+                  console.log(`no matching stock found for ${stockKeyUpper}, saving new`);
                   // if it was liked, save the liker's IP in the likeIPs array
                   if (like) {
                     likeIPs.push(likeIP);
@@ -134,6 +138,7 @@ module.exports = function (app) {
                     });
                 } else { // if the stock already exists in mongo
                     // if the stock was liked, update and save it
+                  console.log(`${stockKeyUpper} already exists, updating and re-saving`);
                     if (like) {
                       // if this IP does not already exist in the likeIPs array
                       if (stockFromMongo.likeIPs.indexOf(likeIP) === -1) {
