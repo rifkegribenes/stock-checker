@@ -140,7 +140,7 @@ module.exports = function (app) {
                           return handleError(res, err);
                         });
                       } else {
-                        // not liked, OR like IP already exists in array, don't need to re-save
+                        // not liked, OR already liked by this IP, don't need to re-save
                         // just createStockObject and return to client
                         createStockObject(stockFromMongo._doc, single, res)
                       }
