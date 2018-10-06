@@ -45,8 +45,8 @@ const getStockData = (stocks) => {
 }
 
 // takes in an array of two stock objects and returns a new array 
-// containing both objects with a new 'rel_likes' key replacing the original 'likes' key
-const formatStockData = data => {
+// containing both objects with a new 'rel_likes' key
+const calculateRelativeLikes = data => {
   // first map through the two objects and substitute the rel_likes value for the # of likes
   return data.map((stockObj, index) => {
     // save a reference to the 'other stock' in the array
@@ -64,7 +64,7 @@ const returnSingle = (stockData, res) => {
 }
 
 const returnTwo = res => {
-  const resultToReturn = formatStockData(result);
+  const resultToReturn = calculateRelativeLikes(result);
   res.status(200).json(resultToReturn);
 }
 

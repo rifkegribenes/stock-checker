@@ -89,7 +89,6 @@ suite('Functional Tests', function() {
               assert.oneOf(res.body[0].stock, ['AAPL','GOOG']);
               assert.oneOf(res.body[1].stock, ['AAPL','GOOG']);
               assert.equal(res.body[0].rel_likes + res.body[1].rel_likes, 0);
-              rel_likes = Math.abs(res.body[0].rel_likes);
               done();
             });
       });
@@ -112,7 +111,6 @@ suite('Functional Tests', function() {
               assert.oneOf(res.body[0].stock, ['AAPL','GOOG']);
               assert.oneOf(res.body[1].stock, ['AAPL','GOOG']);
               assert.equal(res.body[0].rel_likes + res.body[1].rel_likes, 0);
-              assert.equal(Math.abs(res.body[0].rel_likes),rel_likes);
               done();
             }); 
       });
