@@ -107,7 +107,7 @@ module.exports = function (app) {
               .then((stockFromMongo) => {
               // if the stock is not yet in the db
                 if (!stockFromMongo) {
-                  // if it was liked, save the liker's IP in the likeIPs array
+                  // if it was liked, save the liker's IP in the array
                   let likeIPs = [];
                   if (like) {
                     likeIPs.push(likeIP);

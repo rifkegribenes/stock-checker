@@ -74,7 +74,7 @@ suite('Functional Tests', function() {
       test('2 stocks', function(done) {
         chai.request(server)
           .get('/api/stock-prices')
-          .query({stock: ['aapl', 'msft']})
+          .query({stock: ['aapl', 'goog']})
           .end((err, res) => {
               assert.equal(res.status, 200);
               assert.isArray(res.body, 'Res.body should be an array');
@@ -86,8 +86,8 @@ suite('Functional Tests', function() {
               assert.property(res.body[1], 'price', 'Each StockData object should contain price');
               assert.property(res.body[1], 'rel_likes', 'Each StockData object should contain rel_likes');
               assert.property(res.body[1], '_id', 'Each StockData object should contain _id');
-              assert.oneOf(res.body[0].stock, ['AAPL','MSFT']);
-              assert.oneOf(res.body[1].stock, ['AAPL','MSFT']);
+              assert.oneOf(res.body[0].stock, ['AAPL','GOOG']);
+              assert.oneOf(res.body[1].stock, ['AAPL','GOOG']);
               assert.equal(res.body[0].rel_likes + res.body[1].rel_likes, 0);
               rel_likes = Math.abs(res.body[0].rel_likes);
               done();
@@ -97,7 +97,7 @@ suite('Functional Tests', function() {
       test('2 stocks with like', function(done) {
         chai.request(server)
           .get('/api/stock-prices')
-          .query({stock: ['aapl', 'msft'], like: true})
+          .query({stock: ['aapl', 'goog'], like: true})
           .end((err, res) => {
               assert.equal(res.status, 200);
               assert.isArray(res.body);
@@ -109,11 +109,9 @@ suite('Functional Tests', function() {
               assert.property(res.body[1], 'price', 'Each StockData object should contain price');
               assert.property(res.body[1], 'rel_likes', 'Each StockData object should contain rel_likes');
               assert.property(res.body[1], '_id', 'Each StockData object should contain _id');
-              assert.oneOf(res.body[0].stock, ['AAPL','MSFT']);
-              assert.oneOf(res.body[1].stock, ['AAPL','MSFT']);
+              assert.oneOf(res.body[0].stock, ['AAPL','GOOG']);
+              assert.oneOf(res.body[1].stock, ['AAPL','GOOG']);
               assert.equal(res.body[0].rel_likes + res.body[1].rel_likes, 0);
-              console.log('115 > tests.js');
-              console.log(res.body);
               assert.equal(Math.abs(res.body[0].rel_likes),rel_likes);
               done();
             }); 
